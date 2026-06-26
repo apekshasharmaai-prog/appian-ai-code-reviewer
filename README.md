@@ -47,16 +47,6 @@ AI Findings:
 ![Architecture](Architecture.png)
 
 
-# 🛠 Tech Stack
-
-* Python
-* FastAPI
-* OpenAI API
-* Appian SAIL
-* Prompt Engineering
-
----
-
 # 📂 Project Structure
 
 ```

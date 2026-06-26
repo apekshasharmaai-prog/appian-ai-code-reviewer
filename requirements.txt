@@ -1,0 +1,6 @@
+appian integrations
+fastapi 
+uvicorn
+openai API
+python-dotenv
+pydantic

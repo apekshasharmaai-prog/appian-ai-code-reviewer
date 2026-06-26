@@ -42,6 +42,10 @@ AI Findings:
 * Copy-friendly review output
 
 ---
+## Architecture
+
+![Architecture](docs/architecture.png)
+
 
 # 🛠 Tech Stack
 

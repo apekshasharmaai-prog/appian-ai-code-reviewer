@@ -1,0 +1,297 @@
+/* AS_uiDisplayAutomatedCodeReview */
+a!localVariables(
+  local!code: "",
+  local!reviewResult: null,
+  local!showResults: false,
+  local!selectedFinding: null(),
+  a!formLayout(
+    titleBar: "AI Code Reviewer",
+    contents: {
+      if(
+        not(local!showResults),
+        /* ==========================
+           CODE INPUT SCREEN
+           ========================== */
+        {
+          a!cardLayout(
+            contents: {
+              a!paragraphField(
+                label: "Paste Appian Code",
+                value: local!code,
+                saveInto: local!code,
+                height: "TALL",
+                characterLimit: 5000,
+                instructions: "Paste code and receive AI-powered insights on performance, maintainability, security, and best practices."
+              ),
+              a!buttonLayout(
+                primaryButtons: {
+                  a!buttonWidget(
+                    label: "Review",
+                    style: "SOLID",
+                    disabled: a!isNullOrEmpty(local!code),
+                    saveInto: {
+                      rule!AS_getAutomatedCodeReview(
+                        language: "appian",
+                        code: local!code,
+                        onSuccess: {
+                          a!save(local!reviewResult, fv!result.body),
+                          a!save(local!showResults, true)
+                        }
+                      )
+                    }
+                  )
+                },
+                secondaryButtons: a!buttonWidget(
+                  label: "Clear",
+                  style: "GHOST",
+                  color: "SECONDARY",
+                  disabled: a!isNullOrEmpty(local!code),
+                  saveInto: a!save(local!code, null)
+                )
+              )
+            }
+            
+          )
+        },
+        /* ==========================
+           RESULTS SCREEN
+           ========================== */
+        {
+          a!buttonLayout(
+            secondaryButtons: {
+              a!buttonWidget(
+                label: "← Review Another File",
+                style: "LINK",
+                saveInto: { a!save(local!showResults, false),
+                a!save(
+                  local!code,
+                  null
+                )}
+              )
+            }
+          ),
+          a!cardLayout(
+            contents: {
+
+              a!richTextDisplayField(
+                align: "CENTER",
+                value: {
+                  a!richTextItem(
+                    text: local!reviewResult.overall_score,
+                    size: "LARGE_PLUS",
+                    style: "STRONG"
+                  )
+                }
+              ),
+
+              a!richTextDisplayField(
+                align: "CENTER",
+                value: {
+                  a!richTextItem(
+                    text: if(
+                      tointeger(local!reviewResult.overall_score) >= 90,
+                      "🟢 Excellent",
+                      if(
+                        tointeger(local!reviewResult.overall_score) >= 70,
+                        "🔵 Good",
+                        if(
+                          tointeger(local!reviewResult.overall_score) >= 60,
+                          "🟡 Fair",
+                          "🔴 Needs Improvement"
+                        )
+                      )
+                    ),
+                    style: "STRONG",
+                    size:"MEDIUM_PLUS"
+                  )
+                }
+              ),
+
+              a!richTextDisplayField(
+                align: "CENTER",
+                value: "Code Quality Score"
+              )
+
+            },
+            marginBelow: "MORE"
+          ),
+          a!sectionLayout(
+            label: "Code Quality Metrics",
+            labelColor:"STANDARD",
+            contents:
+         { a!columnsLayout(
+            columns: {
+              a!columnLayout(
+                contents: {
+                  a!progressBarField(
+                    label: "Performance",
+                    percentage: tointeger(local!reviewResult.performance_score)
+                  )
+                }
+              ),
+              a!columnLayout(
+                contents: {
+                  a!progressBarField(
+                    label: "Maintainability",
+                    percentage: tointeger(
+                      local!reviewResult.maintainability_score
+                    )
+                  )
+                }
+              )
+            }
+          ),
+          a!columnsLayout(
+            columns: {
+              a!columnLayout(
+                contents: {
+                  a!progressBarField(
+                    label: "Best Practices",
+                    percentage: tointeger(local!reviewResult.best_practices_score)
+                  )
+                }
+              ),
+              a!columnLayout(
+                contents: {
+                  a!progressBarField(
+                    label: "Readability",
+                    percentage: tointeger(local!reviewResult.readability_score)
+                  )
+                }
+              )
+            }
+          )}),
+          a!sectionLayout(
+            label: "Findings (" & length(a!flatten(local!reviewResult.findings)) & ")",
+            labelColor:"STANDARD",
+          contents: a!gridLayout(
+      
+            headerCells: {
+              a!gridLayoutHeaderCell(label: "Title"),
+              a!gridLayoutHeaderCell(label: "Severity"),
+              a!gridLayoutHeaderCell(label: "Category"),
+              
+            },
+            rows: a!forEach(
+              items: local!reviewResult.findings,
+              expression: a!gridRowLayout(
+                contents: {
+                  a!richTextDisplayField(
+                    value: {
+                      a!richTextItem(
+                        text: fv!item.title,
+                        link: a!dynamicLink(
+                          value: fv!item,
+                          saveInto: local!selectedFinding
+                        ),
+                        style: "STRONG"
+                      )
+                    }
+                  ),
+                  a!richTextDisplayField(
+                    value: {
+                      if(
+                        lower(fv!item.severity) = "high",
+                        a!richTextItem(
+                          text: "🔴 High",
+                          color: "NEGATIVE",
+                          style: "STRONG"
+                        ),
+
+                        if(
+                          lower(fv!item.severity) = "medium",
+                          a!richTextItem(
+                            text: "🟠 Medium",
+                            color: "#FF8C00",
+                            style: "STRONG"
+                          ),
+
+                          a!richTextItem(
+                            text: "🟢 Low",
+                            color: "POSITIVE",
+                            style: "STRONG"
+                          )
+                        )
+                      )
+                    }
+                  ),
+                  
+                  a!textField(value: fv!item.category, readOnly: true)
+                }
+              )
+            )
+          )),
+          if(
+            isnull(local!selectedFinding),
+            {},
+            a!cardLayout(
+              marginAbove: "STANDARD",
+              contents: {
+                a!richTextDisplayField(
+                  value: {
+                    a!richTextItem(
+                      text: local!selectedFinding.title,
+                      style: "STRONG",
+                      size: "MEDIUM"
+                    )
+                  }
+                ),
+                a!columnsLayout(
+                  columns: {
+                    a!columnLayout(
+                      contents: {
+                        a!richTextDisplayField(
+                          value: {
+                            "Severity: ",
+                            local!selectedFinding.severity
+                          }
+                        )
+                      }
+                    ),
+                    a!columnLayout(
+                      contents: {
+                        a!richTextDisplayField(
+                          value: {
+                            "Category: ",
+                            local!selectedFinding.category
+                          }
+                        )
+                      }
+                    )
+                  }
+                ),
+                a!paragraphField(
+                  label: "Description",
+                  value: local!selectedFinding.description,
+                  readOnly: true
+                ),
+                a!paragraphField(
+                  label: "Recommendation",
+                  value: local!selectedFinding.recommendation,
+                  readOnly: true
+                ),
+                a!buttonLayout(
+                  secondaryButtons: {
+                    a!buttonWidget(
+                      label: "Close",
+                      saveInto: { a!save(local!selectedFinding, null()) }
+                    )
+                  }
+                )
+              }
+            )
+          ),
+          a!sectionLayout(
+            label: "AI Review Summary",
+
+            labelColor:"STANDARD", 
+          contents: a!paragraphField(
+           
+            value: local!reviewResult.summary,
+            readOnly: true
+          ))
+        }
+      )
+    }
+  )
+)

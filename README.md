@@ -77,9 +77,10 @@ assets/
 Example:
 
 * Input Screen
-
+![alt text](image.png)
 * AI Findings
-
+![alt text](image-1.png)
+![alt text](image-2.png)
 ---
 
 # 💡 Motivation

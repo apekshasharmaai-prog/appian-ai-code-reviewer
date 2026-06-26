@@ -44,7 +44,7 @@ AI Findings:
 ---
 ## Architecture
 
-![Architecture](architecture.png)
+![Architecture](Architecture.png)
 
 
 # 🛠 Tech Stack

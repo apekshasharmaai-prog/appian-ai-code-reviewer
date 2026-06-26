@@ -55,9 +55,9 @@ appian-ai-code-reviewer/
 main.py
 requirements.txt
 README.md
-sample_code/
+sample_appian_ui_code.txt
 screenshots/
-architecture/
+architecture.png
 
 ```
 

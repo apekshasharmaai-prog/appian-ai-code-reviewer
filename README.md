@@ -1,6 +1,6 @@
 # AI-Powered Appian Code Review Assistant
 
-An AI-powered code review assistant that analyzes **Appian SAIL code** and provides actionable feedback on **performance, maintainability, readability, and Appian best practices** using Large Language Models (LLMs).
+An AI-powered code review assistant that analyzes **Appian interfaces and expression rules** and provides actionable feedback on **performance, maintainability, readability, and Appian best practices** using Large Language Models (LLMs).
 
 > ⚡ Built to help Appian developers identify code issues, improve application performance, and accelerate code reviews.
 

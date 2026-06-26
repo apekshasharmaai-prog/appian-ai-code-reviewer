@@ -58,14 +58,13 @@ AI Findings:
 ```
 appian-ai-code-reviewer/
 │
-app.py
+main.py
 requirements.txt
 README.md
-prompts/
-utils/
 sample_code/
 screenshots/
-assets/
+architecture/
+
 ```
 
 ---

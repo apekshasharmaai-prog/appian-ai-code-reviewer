@@ -72,10 +72,6 @@ assets/
 
 # 🖥️ Screenshots
 
-> *(Add screenshots here once available.)*
-
-Example:
-
 * Input Screen
 ![alt text](image.png)
 * AI Findings
